@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
  */
 public class Cajero {
 
-    private int saldo = 7000000, saldoC = 20000000, retiroD = 2100000;
+    private int saldo = 7000000, retiroD = 2100000, retiroAcomulado = 0;
     private boolean continuar = true;
 
     public Cajero() {
@@ -24,22 +24,23 @@ public class Cajero {
         this.saldo = saldo;
     }
 
-    public int getSaldoC() {
-        return saldoC;
-    }
-
-    public void setSaldoC(int saldoC) {
-        this.saldoC = saldoC;
-    }
-
     public int getRetiroD() {
         return retiroD;
     }
 
     public void setRetiroD(int retiroD) {
         this.retiroD = retiroD;
-
     }
+
+    public int getRetiroAcumulado() {
+        return retiroAcomulado;
+    }
+
+    public void setRetiroAcumulado(int retiroAcumulado) {
+        this.retiroAcomulado = retiroAcumulado;
+    }
+
+   
 
     public void cajero() {
         while (continuar) {
@@ -71,13 +72,13 @@ public class Cajero {
                         retirarDinero();
                         break;
                     case 4:
-                        if (confirmarSalida()){
-                       continuar = false;
+                        if (confirmarSalida()) {
+                            continuar = false;
                         }
-                     
+
                         continue;
                     default:
-                        JOptionPane.showMessageDialog(null,"Error ingrese numeros del 1 al 4");
+                        JOptionPane.showMessageDialog(null, "Error ingrese numeros del 1 al 4");
 
                 }
             } catch (NumberFormatException e) {
@@ -116,15 +117,16 @@ public class Cajero {
 
         JOptionPane.showMessageDialog(null, "NO INGRESAR MONEDAS", "ADVERTENCIA",
                 JOptionPane.WARNING_MESSAGE);
-        String consigna = JOptionPane.showInputDialog("Monto a consignar:");
+        String consigna = JOptionPane.showInputDialog("Ingrese su monto a consignar:");
         if (consigna == null) {
 
         }
+
         try {
             int monto = Integer.parseInt(consigna);
             if (monto % 10000 == 0) {
                 saldo += monto;
-                JOptionPane.showMessageDialog(null, "Consignacion exitosa \n su nuevo saldo es: "
+                JOptionPane.showMessageDialog(null, "Consignacion exitosa \nSu nuevo saldo es: "
                         + saldo);
             } else {
                 JOptionPane.showInternalMessageDialog(null, "Monto invalido",
@@ -136,29 +138,49 @@ public class Cajero {
     }
 
     public void retirarDinero() {
-        String saldoRet = JOptionPane.showInputDialog("Monto a retirar:");
-        if (saldoRet == null);
-        try {
-            int retiro = Integer.parseInt(saldoRet);
-            if (retiro <= 0) {
-                JOptionPane.showMessageDialog(null, "Monto invalido");
-            } else if (retiro > retiroD) {
-                JOptionPane.showMessageDialog(null, "Excede el limite diario de retiro: " + retiroD);
-            } else if (retiro > saldo) {
-                JOptionPane.showMessageDialog(null, "Saldo insuficiente");
-            } else if (retiro % 10000 == 0 && retiro > 9000) {
 
-                saldo -= retiro;
-                JOptionPane.showMessageDialog(null,
-                        "Retiro exitoso \n Nuevo saldo: " + saldo);
-            } else {
-                JOptionPane.showMessageDialog(null, "Monto invalido");
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Ingrese un numero valido", "ERROR",
-                    JOptionPane.ERROR_MESSAGE);
-
+        String saldoRet = JOptionPane.showInputDialog("Ingrese su monto a retirar:");
+        if (saldoRet == null) {
+            return;
         }
 
+        try {
+
+            int retiro = Integer.parseInt(saldoRet);
+
+            if (retiro <= 0) {
+                JOptionPane.showMessageDialog(null, "Monto invalido");
+                return;
+            }
+
+            if (retiro % 10000 != 0) {
+                JOptionPane.showMessageDialog(null, "Monto no permitido");
+                return;
+            }
+
+            if (retiro > saldo) {
+                JOptionPane.showMessageDialog(null, "Saldo insuficiente");
+                return;
+            }
+
+            if (retiroAcomulado + retiro > retiroD) {
+                JOptionPane.showMessageDialog(null,
+                        "Excede el limite diario de " + retiroD
+                        + "\n Su retiro acomulado es: " + retiroAcomulado);
+                return;
+            }
+
+            saldo -= retiro;
+            retiroAcomulado += retiro;
+
+            JOptionPane.showMessageDialog(null,
+                    "Retiro exitoso \n Nuevo saldo: " + saldo
+                    + "\n Retiro acomulado hoy: " + retiroAcomulado);
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null,
+                    "Ingrese un numero valido", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
+
 }
